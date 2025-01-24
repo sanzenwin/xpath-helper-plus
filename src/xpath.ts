@@ -1,3 +1,5 @@
+import { finder } from '@medv/finder'
+
 const elementsShareFamily = (primaryEl: Element, siblingEl: Element) => {
     const p = primaryEl, s = siblingEl;
     return (p.tagName === s.tagName &&
@@ -22,7 +24,10 @@ const getElementIndex = (el: Element) => {
     }
     return 0;
 };
-const makeQueryForElement = (el: any, toShort: boolean = false, batch: boolean = false) => {
+const makeQueryForElement = (el: any, toShort: boolean = true, batch: boolean = false, css: boolean = true) => {
+    if (css){
+        return finder(el)
+    }
     let query = '';
     for (; el && el.nodeType === Node.ELEMENT_NODE; el = el.parentNode) {
         el.classList.remove('xh-highlight')
@@ -56,7 +61,7 @@ const makeQueryForElement = (el: any, toShort: boolean = false, batch: boolean =
     return query;
 };
 const highlight = (els: Element | Element[]) => {
-    Array.isArray(els) ? els.forEach(el => el.classList.add('xh-highlight')) : els.classList.add('xh-highlight');
+    Array.isArray(els) ? els.forEach(highlight) : els.classList.add('xh-highlight');
 };
 
 const clearHighlights = () => {
@@ -102,7 +107,14 @@ const evalNodeValue = (xpathResult: XPathResult) => {
     highlight(toHighlight);
     return [str, nodeCount];
 }
-const evaluateQuery = (query: string) => {
+const evaluateQuery = (query: string, css: boolean) => {
+    if (css){
+        const el = document.querySelector(query)
+        if (el){
+            highlight(el);
+            return [el.textContent, 1]
+        }
+    }
     let xpathResult = null;
     let str = '';
     let nodeCount = 0;

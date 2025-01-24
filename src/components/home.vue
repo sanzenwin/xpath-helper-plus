@@ -6,14 +6,15 @@ import xPathToCss from "xpath-to-css"
 const { isSupported, copy } = useClipboard()
 const mode = ref<string>("xpath")
 const xpathRule = ref<string>("string('xpath helper plus')")
-const xpathShort = useLocalStorage<boolean>("xpathShort", false)
+const xpathShort = useLocalStorage<boolean>("xpathShort", true)
 const xpathBatch = useLocalStorage<boolean>("xpathBatch", false)
+const outputCss = useLocalStorage<boolean>("outputCss", true)
 const xpathResult = ref<string>("");
 const xpathResultCount = ref<number | null>(null);
 
 watch(() => xpathRule.value, () => {
   sendMessageToContentScript(
-    { cmd: mode.value, value: xpathRule.value },
+    { cmd: mode.value, value: xpathRule.value, css: outputCss.value},
     function (response: any) {
       xpathResult.value = response[0];
       xpathResultCount.value = response[1];
@@ -24,6 +25,12 @@ const handleShort = (v: boolean) => {
   xpathShort.value = v
   sendMessageToContentScript(
     { cmd: "short", value: xpathShort.value }
+  )
+}
+const handleCss = (v: boolean) => {
+  outputCss.value = v
+  sendMessageToContentScript(
+      { cmd: "css", value: outputCss.value }
   )
 }
 const handleBatch = (v: boolean) => {
@@ -42,7 +49,10 @@ const handleCopy = () => {
   copy(xpathRule.value)
 }
 const handleToCss = () => {
-  const cssRule = xPathToCss(xpathRule.value)
+  let cssRule = xpathRule.value;
+  if (!outputCss.value){
+      cssRule = xPathToCss(cssRule)
+  }
   copy(cssRule)
 }
 
@@ -64,7 +74,8 @@ chrome?.runtime && chrome.runtime.onMessage.addListener(function (request: any, 
             <el-space wrap>
               <span class="text-size-2">XPATH</span>
               <el-checkbox v-model="xpathShort" @change="handleShort">精简xpath</el-checkbox>
-              <el-checkbox v-model="xpathBatch" @change="handleBatch">列表模式</el-checkbox>
+              <el-checkbox v-model="xpathBatch" @change="handleBatch" :disabled="outputCss">列表模式</el-checkbox>
+              <el-checkbox v-model="outputCss" @change="handleCss">输出Css</el-checkbox>
             </el-space>
           </el-col>
           <el-col :span="12" class="text-right">
