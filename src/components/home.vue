@@ -81,13 +81,13 @@ chrome?.runtime && chrome.runtime.onMessage.addListener(function (request: any, 
           <el-col :span="12" class="text-right">
             <el-space wrap alignment="flex-start">
               <el-button type="primary" link @click="handleCopy" v-if="isSupported">复制</el-button>
-              <el-tooltip effect="light" content="将xpath语句转为css选择器" placement="bottom">
+              <el-tooltip effect="light" content="将语句转为css选择器" placement="bottom">
                 <el-button type="primary" link @click="handleToCss" v-if="isSupported">复制css</el-button>
               </el-tooltip>
             </el-space>
           </el-col>
         </el-row>
-        <el-input type="textarea" v-model="xpathRule" rows="4" />
+        <el-input type="textarea" spellcheck="false" style="font-size: 12pt" v-model="xpathRule" rows="4" />
       </el-col>
       <el-col :span="12">
         <el-row justify="space-between">
