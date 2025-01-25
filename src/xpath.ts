@@ -26,7 +26,10 @@ const getElementIndex = (el: Element) => {
 };
 const makeQueryForElement = (el: any, toShort: boolean = true, batch: boolean = false, css: boolean = true) => {
     if (css){
-        return finder(el)
+        return finder(el, {
+            className: ()=>true,
+            attr: ()=>true,
+        })
     }
     let query = '';
     for (; el && el.nodeType === Node.ELEMENT_NODE; el = el.parentNode) {
