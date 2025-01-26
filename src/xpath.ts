@@ -1,4 +1,4 @@
-import { finder } from '@medv/finder'
+import {finder} from '@medv/finder'
 
 const elementsShareFamily = (primaryEl: Element, siblingEl: Element) => {
     const p = primaryEl, s = siblingEl;
@@ -25,10 +25,10 @@ const getElementIndex = (el: Element) => {
     return 0;
 };
 const makeQueryForElement = (el: any, toShort: boolean = true, batch: boolean = false, css: boolean = true) => {
-    if (css){
+    if (css) {
         return finder(el, {
-            className: ()=>true,
-            attr: ()=>true,
+            className: () => true,
+            idName: () => true
         })
     }
     let query = '';
@@ -87,7 +87,7 @@ const evalNodeValue = (xpathResult: XPathResult) => {
     } else if (xpathResult.resultType ===
         XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
         for (let node = xpathResult.iterateNext(); node;
-            node = xpathResult.iterateNext()) {
+             node = xpathResult.iterateNext()) {
             if (node.nodeType === Node.ELEMENT_NODE) {
                 toHighlight.push(<Element>node);
             }
@@ -111,9 +111,9 @@ const evalNodeValue = (xpathResult: XPathResult) => {
     return [str, nodeCount];
 }
 const evaluateQuery = (query: string, css: boolean) => {
-    if (css){
+    if (css) {
         const el = document.querySelector(query)
-        if (el){
+        if (el) {
             highlight(el);
             return [el.textContent, 1]
         }

@@ -12,7 +12,8 @@ class Bar {
     }
 
     createIframe():void {
-        document.body.appendChild(this.iframe)
+        if(window.parent === window)
+            document.body.appendChild(this.iframe)
     }
     moveBar() {
         this.iframe.classList.toggle('bottom');
