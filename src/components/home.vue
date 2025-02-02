@@ -6,21 +6,31 @@ import xPathToCss from "xpath-to-css"
 const {isSupported, copy} = useClipboard()
 const mode = ref<string>("xpath")
 const windowUid = ref<string>("")
-const xpathRule = ref<string>("string('xpath helper plus')")
+const xpathRule = ref<string>("")
 const xpathShort = useLocalStorage<boolean>("xpathShort", true)
 const xpathBatch = useLocalStorage<boolean>("xpathBatch", false)
 const outputCss = useLocalStorage<boolean>("outputCss", true)
 const xpathResult = ref<string>("");
 const xpathResultCount = ref<number | null>(null);
+const record = ref<string>("");
 
-watch(() => xpathRule.value, () => {
+watch(xpathRule, value => {
+  appendRecord(value)
   sendMessageToContentScript(
-      {cmd: mode.value, value: xpathRule.value, css: outputCss.value, uid: windowUid.value},
+      {cmd: mode.value, value, css: outputCss.value, uid: windowUid.value},
       function (response: any) {
         xpathResult.value = response[0];
         xpathResultCount.value = response[1];
       });
 }, {immediate: true});
+
+function appendRecord(value: string) {
+  if (!record.value.includes(value)) {
+    if (record.value)
+      record.value += '\n\n\n'
+    record.value += value
+  }
+}
 
 const handleShort = (v: boolean) => {
   xpathShort.value = v
@@ -56,6 +66,9 @@ const handleToCss = () => {
   }
   copy(cssRule)
 }
+const handleRecord = () => {
+  copy(record.value)
+}
 
 // 接收来自content-script的消息
 chrome?.runtime && chrome.runtime.onMessage.addListener(function (request: any, sender: any, sendResponse: any) {
@@ -82,10 +95,12 @@ chrome?.runtime && chrome.runtime.onMessage.addListener(function (request: any, 
           </el-col>
           <el-col :span="12" class="text-right">
             <el-space wrap alignment="flex-start">
-              <el-button type="primary" link @click="handleCopy" v-if="isSupported">复制</el-button>
+              <el-button type="primary" link @click="handleCopy" v-if="isSupported">xpath</el-button>
               <el-tooltip effect="light" content="将语句转为css选择器" placement="bottom">
-                <el-button type="primary" link @click="handleToCss" v-if="isSupported">复制css</el-button>
+                <el-button type="primary" link @click="handleToCss" v-if="isSupported">css</el-button>
               </el-tooltip>
+              <el-button type="primary" link @click="handleRecord" v-if="isSupported">纪录</el-button>
+              <el-button type="danger" link @click="record=''" v-if="isSupported">清除纪录</el-button>
             </el-space>
           </el-col>
         </el-row>
