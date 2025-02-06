@@ -1,5 +1,12 @@
 import {finder} from '@medv/finder'
 
+const getCssQuery = (el: Element) => {
+    return finder(el, {
+        className: () => true,
+        idName: () => true
+    })
+}
+
 const elementsShareFamily = (primaryEl: Element, siblingEl: Element) => {
     const p = primaryEl, s = siblingEl;
     return (p.tagName === s.tagName &&
@@ -26,10 +33,7 @@ const getElementIndex = (el: Element) => {
 };
 const makeQueryForElement = (el: any, toShort: boolean = true, batch: boolean = false, css: boolean = true) => {
     if (css) {
-        return finder(el, {
-            className: () => true,
-            idName: () => true
-        })
+        return getCssQuery(el)
     }
     let query = '';
     for (; el && el.nodeType === Node.ELEMENT_NODE; el = el.parentNode) {
@@ -141,5 +145,6 @@ export {
     highlight,
     clearHighlights,
     evaluateQuery,
-    makeQueryForElement
+    makeQueryForElement,
+    getCssQuery,
 }
